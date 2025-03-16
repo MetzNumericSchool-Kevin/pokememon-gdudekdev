@@ -93,55 +93,54 @@ function initializeGrid(gridSetup) {
 let selectedBuissons = [];
 // Variable pour le nombre de coups
 let nombreDeCoups = 0;
+// Variable pour suivre les Pokémon capturés
+let capturedPokemons = [];
 
 // Fonction pour vider la sidebar
 function clearSidebar() {
   const listePokemonsCaptures = document.querySelector(
     ".liste_pokemons_captures"
   );
-  listePokemonsCaptures.innerHTML = ""; 
+  listePokemonsCaptures.innerHTML = "";
 }
 
 // Fonction pour ajouter un Pokémon capturé à la sidebar
 function addCapturedPokemon(pokemon) {
-  console.log(pokemon);
   const listePokemonsCaptures = document.querySelector(
     ".liste_pokemons_captures"
   );
 
   const pokemonImg = document.createElement("img");
-  pokemonImg.src = pokemon.sprite; 
-  pokemonImg.alt = pokemon.name; 
+  pokemonImg.src = pokemon.sprite;
+  pokemonImg.alt = pokemon.name;
 
   listePokemonsCaptures.appendChild(pokemonImg);
+  capturedPokemons.push(pokemon);
+  checkWinCondition();
 }
 
 // Fonction de gestion du clic sur les cellules
 function handleCellClick(event) {
-  // Ne pas procéder si la cellule ne contient pas de buisson
-  const cell = event.target.closest(".col.box"); // On s'assure de sélectionner la cellule .col.box
+  const cell = event.target.closest(".col.box");
   if (!cell || !cell.querySelector(".bush") || selectedBuissons.length >= 2)
     return;
 
-  // Ajouter la cellule sélectionnée à la liste des buissons sélectionnés
-  selectedBuissons.push(cell);
-
-  // Afficher le Pokémon caché derrière le buisson (si non déjà affiché)
+  // Vérifier si le Pokémon a déjà été révélé et ne pas permettre un clic
   const bush = cell.querySelector(".bush");
   const pokemonImg = cell.querySelector(".pokemon");
 
-  // On cache le buisson et on affiche le Pokémon
+  if (pokemonImg.style.display === "block") return; // Ne pas permettre de cliquer sur un Pokémon déjà révélé
+
+  selectedBuissons.push(cell);
+
   bush.style.opacity = "0";
   pokemonImg.style.display = "block";
 
-  // Si deux buissons ont été sélectionnés
   if (selectedBuissons.length === 2) {
-    // Vérifier si les deux Pokémon sont identiques
     const [firstCell, secondCell] = selectedBuissons;
     const firstPokemon = firstCell.querySelector(".pokemon");
     const secondPokemon = secondCell.querySelector(".pokemon");
 
-    
     if (firstPokemon.alt === secondPokemon.alt) {
       let pokeball = document.createElement("img");
       pokeball.src = "./assets/pokeball.png";
@@ -149,12 +148,12 @@ function handleCellClick(event) {
       pokeball.classList.add("pokeball");
 
       const clonedPokeball1 = pokeball.cloneNode(true);
-      firstCell.appendChild(clonedPokeball1); 
+      firstCell.appendChild(clonedPokeball1);
 
       const clonedPokeball2 = pokeball.cloneNode(true);
-      secondCell.appendChild(clonedPokeball2); 
+      secondCell.appendChild(clonedPokeball2);
 
-      addCapturedPokemon({ name: firstPokemon.alt, sprite: firstPokemon.src }); 
+      addCapturedPokemon({ name: firstPokemon.alt, sprite: firstPokemon.src });
     } else {
       setTimeout(() => {
         firstCell.querySelector(".bush").style.opacity = "1";
@@ -163,11 +162,34 @@ function handleCellClick(event) {
         secondPokemon.style.display = "none";
       }, 1000);
     }
+
     selectedBuissons = [];
 
     nombreDeCoups++;
     document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
   }
+}
+
+// Fonction pour vérifier si l'utilisateur a gagné
+function checkWinCondition() {
+  if (capturedPokemons.length === 6) {
+    // Si tous les Pokémon sont capturés, afficher le bouton de rejouer
+    const rejouerButton = document.getElementById("rejouer");
+    rejouerButton.style.display = "block";
+  }
+}
+
+// Fonction pour recommencer le jeu
+function restartGame() {
+  nombreDeCoups = 0;
+  capturedPokemons = [];
+  document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
+
+  // Cacher le bouton de rejouer
+  document.getElementById("rejouer").style.display = "none";
+
+  // Relancer le jeu
+  main();
 }
 
 // Boucle principale du jeu
@@ -194,3 +216,6 @@ async function main() {
 
 // Démarrer le jeu
 main();
+
+// Ajouter un gestionnaire pour le bouton Rejouer
+document.getElementById("rejouer").addEventListener("click", restartGame);
