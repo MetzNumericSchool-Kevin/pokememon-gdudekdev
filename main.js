@@ -9,6 +9,14 @@ async function getData() {
   }
 }
 
+// Fonction pour mélanger un tableau
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
 // Fonction pour choisir `n` Pokémon aléatoires sans répétition
 function getRandomElements(arr, n) {
   const selected = new Set();
@@ -25,17 +33,60 @@ function rdPokemon(recordset) {
 
 // Fonction pour choisir la position des Pokémon sur une grille 4x3
 function gridPokemon(gameset) {
-  const duplicatedGameset = [...gameset, ...gameset];
-  const gridPositions = new Set();
+  const duplicatedGameset = [...gameset, ...gameset]; // Chaque Pokémon apparaît deux fois
 
-  while (gridPositions.size < duplicatedGameset.length) {
-    gridPositions.add(Math.floor(Math.random() * 12));
-  }
+  shuffleArray(duplicatedGameset);
 
-  return [...gridPositions].map((pos, index) => ({
+  // Générer un tableau de 12 positions uniques (0 à 11)
+  const gridPositions = Array.from({ length: 12 }, (_, index) => index);
+
+  shuffleArray(gridPositions);
+
+  // Assigner les Pokémon aux positions
+  return gridPositions.map((pos, index) => ({
     position: pos,
     pokemon: duplicatedGameset[index],
   }));
+}
+
+// Initialisation de la grille de jeu
+function initializeGrid(gridSetup) {
+  const gridCells = document.querySelectorAll("#grille_de_jeu .col.box");
+
+  // Supprimer toutes les images existantes dans les cellules
+  gridCells.forEach((cell) => {
+    const existingImages = cell.querySelectorAll("img");
+    existingImages.forEach((img) => {
+      img.remove();
+    });
+  });
+
+  gridCells.forEach((cell) => {
+    // Ajout des buissons (display none par defaut)
+    const bushImg = document.createElement("img");
+    bushImg.src = "./assets/bush.webp";
+    bushImg.alt = "Bush";
+    bushImg.classList.add("bush");
+    cell.appendChild(bushImg);
+
+    // Ajout des pokemons selon le gridSetup
+    const pokemonImg = document.createElement("img");
+    pokemonImg.classList.add("pokemon");
+    pokemonImg.style.display = "none";
+    cell.appendChild(pokemonImg);
+  });
+
+  gridSetup.forEach((item) => {
+    const { position, pokemon } = item;
+    const { sprite, name } = pokemon;
+
+    const cell = gridCells[position];
+
+    const pokemonImg = cell.querySelector("img.pokemon");
+
+    pokemonImg.src = sprite;
+    pokemonImg.alt = name;
+  });
 }
 
 // Boucle principale du jeu
@@ -45,11 +96,12 @@ async function main() {
 
   // Étape 1: Choisir 6 Pokémon au hasard
   const gameset = rdPokemon(recordset);
-  console.log("Pokémon sélectionnés :", gameset);
 
   // Étape 2: Placer ces Pokémon aléatoirement sur une grille 4x3
   const gridSetup = gridPokemon(gameset);
-  console.log("Placement des Pokémon :", gridSetup);
+
+  // Etape 3: Initialisation de la grille
+  initializeGrid(gridSetup);
 }
 
 // Démarrer le jeu
