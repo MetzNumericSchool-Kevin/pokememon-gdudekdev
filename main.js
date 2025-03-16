@@ -176,11 +176,25 @@ function checkWinCondition() {
     // Si tous les Pokémon sont capturés, afficher le bouton de rejouer
     const rejouerButton = document.getElementById("rejouer");
     rejouerButton.style.display = "block";
+
+    // Vérifier et mettre à jour le record
+    updateRecord();
+  }
+}
+
+// Fonction pour mettre à jour le record
+function updateRecord() {
+  const storedRecord = localStorage.getItem("pokemon_record");
+  if (!storedRecord || nombreDeCoups < storedRecord) {
+    // Si le nombre de coups actuel est meilleur que le record ou s'il n'y a pas de record, on met à jour
+    localStorage.setItem("pokemon_record", nombreDeCoups);
+    document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
   }
 }
 
 // Fonction pour recommencer le jeu
 function restartGame() {
+  // Réinitialiser le nombre de coups et les Pokémon capturés
   nombreDeCoups = 0;
   capturedPokemons = [];
   document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
@@ -212,10 +226,17 @@ async function main() {
   document.querySelectorAll(".col.box").forEach((cell) => {
     cell.addEventListener("click", handleCellClick);
   });
+
+  // Mettre à jour le record affiché au début du jeu
+  const storedRecord = localStorage.pokemon_record;
+  console.log(localStorage)
+  if (storedRecord) {
+    document.getElementById("record").textContent = storedRecord;
+  }
 }
 
 // Démarrer le jeu
 main();
 
-// Ajouter un gestionnaire pour le bouton Rejouer
+// Ajouter un gestionnaire pour le bouton "Rejouer"
 document.getElementById("rejouer").addEventListener("click", restartGame);
