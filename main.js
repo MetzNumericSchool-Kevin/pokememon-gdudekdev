@@ -94,9 +94,32 @@ let selectedBuissons = [];
 // Variable pour le nombre de coups
 let nombreDeCoups = 0;
 
+// Fonction pour vider la sidebar
+function clearSidebar() {
+  const listePokemonsCaptures = document.querySelector(
+    ".liste_pokemons_captures"
+  );
+  listePokemonsCaptures.innerHTML = ""; 
+}
+
+// Fonction pour ajouter un Pokémon capturé à la sidebar
+function addCapturedPokemon(pokemon) {
+  console.log(pokemon);
+  const listePokemonsCaptures = document.querySelector(
+    ".liste_pokemons_captures"
+  );
+
+  const pokemonImg = document.createElement("img");
+  pokemonImg.src = pokemon.sprite; 
+  pokemonImg.alt = pokemon.name; 
+
+  listePokemonsCaptures.appendChild(pokemonImg);
+}
+
+// Fonction de gestion du clic sur les cellules
 function handleCellClick(event) {
   // Ne pas procéder si la cellule ne contient pas de buisson
-  const cell = event.target.closest(".col.box"); 
+  const cell = event.target.closest(".col.box"); // On s'assure de sélectionner la cellule .col.box
   if (!cell || !cell.querySelector(".bush") || selectedBuissons.length >= 2)
     return;
 
@@ -113,12 +136,12 @@ function handleCellClick(event) {
 
   // Si deux buissons ont été sélectionnés
   if (selectedBuissons.length === 2) {
-    
+    // Vérifier si les deux Pokémon sont identiques
     const [firstCell, secondCell] = selectedBuissons;
     const firstPokemon = firstCell.querySelector(".pokemon");
     const secondPokemon = secondCell.querySelector(".pokemon");
 
-
+    
     if (firstPokemon.alt === secondPokemon.alt) {
       let pokeball = document.createElement("img");
       pokeball.src = "./assets/pokeball.png";
@@ -130,8 +153,9 @@ function handleCellClick(event) {
 
       const clonedPokeball2 = pokeball.cloneNode(true);
       secondCell.appendChild(clonedPokeball2); 
-    } else {
 
+      addCapturedPokemon({ name: firstPokemon.alt, sprite: firstPokemon.src }); 
+    } else {
       setTimeout(() => {
         firstCell.querySelector(".bush").style.opacity = "1";
         secondCell.querySelector(".bush").style.opacity = "1";
@@ -145,6 +169,7 @@ function handleCellClick(event) {
     document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
   }
 }
+
 // Boucle principale du jeu
 async function main() {
   const recordset = await getData();
@@ -158,6 +183,7 @@ async function main() {
 
   // Etape 3: Initialisation de la grille
   initializeGrid(gridSetup);
+  clearSidebar();
 
   // Etape 4: au tour de l'utilisateur de jouer
   // Initialisation des interactions de l'utilisateur
