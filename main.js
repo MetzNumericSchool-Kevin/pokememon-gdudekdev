@@ -91,20 +91,19 @@ function initializeGrid(gridSetup) {
 
 // Variable pour garder la trace des buissons sélectionnés
 let selectedBuissons = [];
-// Fonction de jeu principale
-function handleCellClick(event) {
-  console.log("click");
-  // On vérifie si la cellule est bien un buisson
-  const cell = event.target.closest(".col.box");
-  if (!cell || !cell.querySelector(".bush")) return;
+// Variable pour le nombre de coups
+let nombreDeCoups = 0;
 
-  // Si on a déjà deux buissons, on ne fait rien, on créera une fonction pour gérer ça après
-  if (selectedBuissons.length >= 2) return;
+function handleCellClick(event) {
+  // Ne pas procéder si la cellule ne contient pas de buisson
+  const cell = event.target.closest(".col.box"); 
+  if (!cell || !cell.querySelector(".bush") || selectedBuissons.length >= 2)
+    return;
 
   // Ajouter la cellule sélectionnée à la liste des buissons sélectionnés
   selectedBuissons.push(cell);
 
-  // Afficher le Pokémon caché derrière le buisson
+  // Afficher le Pokémon caché derrière le buisson (si non déjà affiché)
   const bush = cell.querySelector(".bush");
   const pokemonImg = cell.querySelector(".pokemon");
 
@@ -114,29 +113,38 @@ function handleCellClick(event) {
 
   // Si deux buissons ont été sélectionnés
   if (selectedBuissons.length === 2) {
-    // Vérifier si les deux Pokémon sont identiques
+    
     const [firstCell, secondCell] = selectedBuissons;
     const firstPokemon = firstCell.querySelector(".pokemon");
     const secondPokemon = secondCell.querySelector(".pokemon");
 
+
     if (firstPokemon.alt === secondPokemon.alt) {
-      // Si les Pokémon sont identiques, les laisser visibles
-      console.log("Les Pokémon sont identiques !");
+      let pokeball = document.createElement("img");
+      pokeball.src = "./assets/pokeball.png";
+      pokeball.alt = "Pokéball";
+      pokeball.classList.add("pokeball");
+
+      const clonedPokeball1 = pokeball.cloneNode(true);
+      firstCell.appendChild(clonedPokeball1); 
+
+      const clonedPokeball2 = pokeball.cloneNode(true);
+      secondCell.appendChild(clonedPokeball2); 
     } else {
-      // Si les Pokémon ne sont pas identiques, les cacher à nouveau après un délai
+
       setTimeout(() => {
         firstCell.querySelector(".bush").style.opacity = "1";
         secondCell.querySelector(".bush").style.opacity = "1";
         firstPokemon.style.display = "none";
         secondPokemon.style.display = "none";
-      }, 1000); 
+      }, 1000);
     }
-
-    // Réinitialiser la sélection
     selectedBuissons = [];
+
+    nombreDeCoups++;
+    document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
   }
 }
-
 // Boucle principale du jeu
 async function main() {
   const recordset = await getData();
