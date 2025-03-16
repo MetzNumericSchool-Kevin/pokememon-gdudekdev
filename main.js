@@ -89,6 +89,54 @@ function initializeGrid(gridSetup) {
   });
 }
 
+// Variable pour garder la trace des buissons sélectionnés
+let selectedBuissons = [];
+// Fonction de jeu principale
+function handleCellClick(event) {
+  console.log("click");
+  // On vérifie si la cellule est bien un buisson
+  const cell = event.target.closest(".col.box");
+  if (!cell || !cell.querySelector(".bush")) return;
+
+  // Si on a déjà deux buissons, on ne fait rien, on créera une fonction pour gérer ça après
+  if (selectedBuissons.length >= 2) return;
+
+  // Ajouter la cellule sélectionnée à la liste des buissons sélectionnés
+  selectedBuissons.push(cell);
+
+  // Afficher le Pokémon caché derrière le buisson
+  const bush = cell.querySelector(".bush");
+  const pokemonImg = cell.querySelector(".pokemon");
+
+  // On cache le buisson et on affiche le Pokémon
+  bush.style.opacity = "0";
+  pokemonImg.style.display = "block";
+
+  // Si deux buissons ont été sélectionnés
+  if (selectedBuissons.length === 2) {
+    // Vérifier si les deux Pokémon sont identiques
+    const [firstCell, secondCell] = selectedBuissons;
+    const firstPokemon = firstCell.querySelector(".pokemon");
+    const secondPokemon = secondCell.querySelector(".pokemon");
+
+    if (firstPokemon.alt === secondPokemon.alt) {
+      // Si les Pokémon sont identiques, les laisser visibles
+      console.log("Les Pokémon sont identiques !");
+    } else {
+      // Si les Pokémon ne sont pas identiques, les cacher à nouveau après un délai
+      setTimeout(() => {
+        firstCell.querySelector(".bush").style.opacity = "1";
+        secondCell.querySelector(".bush").style.opacity = "1";
+        firstPokemon.style.display = "none";
+        secondPokemon.style.display = "none";
+      }, 1000); 
+    }
+
+    // Réinitialiser la sélection
+    selectedBuissons = [];
+  }
+}
+
 // Boucle principale du jeu
 async function main() {
   const recordset = await getData();
@@ -102,6 +150,12 @@ async function main() {
 
   // Etape 3: Initialisation de la grille
   initializeGrid(gridSetup);
+
+  // Etape 4: au tour de l'utilisateur de jouer
+  // Initialisation des interactions de l'utilisateur
+  document.querySelectorAll(".col.box").forEach((cell) => {
+    cell.addEventListener("click", handleCellClick);
+  });
 }
 
 // Démarrer le jeu
