@@ -1,4 +1,4 @@
-// Récupération des données du json
+// Récupération des données du JSON
 async function getData() {
   try {
     const response = await fetch("http://localhost:5500/data/pokemon.json");
@@ -9,17 +9,9 @@ async function getData() {
   }
 }
 
-(async () => {
-  const recordset = await getData();
-  console.log(recordset);
-})();
-
-
-// Fonction du choix des Pokémon parmis le dataset
-// On a besoin de pouvoir choisir p éléments dans un tableau à n éléments sans répétitions
-
+// Fonction pour choisir `n` Pokémon aléatoires sans répétition
 function getRandomElements(arr, n) {
-  const selected = new Set();// Set permet d'éviter les répétitions
+  const selected = new Set();
   while (selected.size < n) {
     const randomIndex = Math.floor(Math.random() * arr.length);
     selected.add(arr[randomIndex]);
@@ -27,15 +19,38 @@ function getRandomElements(arr, n) {
   return [...selected];
 }
 
-
 function rdPokemon(recordset) {
-  return getRandomElements(recordset,6);
+  return getRandomElements(recordset, 6);
 }
-// A priori on a bien 6 pokemon différents lors de l'appel de la fonction
 
-// Création de la boucle de jeu
-function main() {
-      // Etape 1: Choisir les pokemons qui vont apparaitre dans le jeu de manière aléatoire (6 pokemon par partie)
-      const gameset = rdPokemon(recordset);
-      
+// Fonction pour choisir la position des Pokémon sur une grille 4x3
+function gridPokemon(gameset) {
+  const duplicatedGameset = [...gameset, ...gameset];
+  const gridPositions = new Set();
+
+  while (gridPositions.size < duplicatedGameset.length) {
+    gridPositions.add(Math.floor(Math.random() * 12));
+  }
+
+  return [...gridPositions].map((pos, index) => ({
+    position: pos,
+    pokemon: duplicatedGameset[index],
+  }));
 }
+
+// Boucle principale du jeu
+async function main() {
+  const recordset = await getData();
+  if (!recordset) return;
+
+  // Étape 1: Choisir 6 Pokémon au hasard
+  const gameset = rdPokemon(recordset);
+  console.log("Pokémon sélectionnés :", gameset);
+
+  // Étape 2: Placer ces Pokémon aléatoirement sur une grille 4x3
+  const gridSetup = gridPokemon(gameset);
+  console.log("Placement des Pokémon :", gridSetup);
+}
+
+// Démarrer le jeu
+main();
