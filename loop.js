@@ -29,9 +29,9 @@ export function addCapturedPokemon(pokemon) {
 
 // Fonction de gestion du clic sur les cellules
 
-let isClickable = false;
 
 export function handleCellClick(cell) {
+  let isClickable = false;
       if (isClickable) return;
    
       if (!cell || !cell.querySelector(".bush") || selectedBuissons.length >= 2) return;
