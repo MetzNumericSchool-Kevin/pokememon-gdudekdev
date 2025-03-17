@@ -120,7 +120,11 @@ function addCapturedPokemon(pokemon) {
 }
 
 // Fonction de gestion du clic sur les cellules
+let isClickable = false;
+
 function handleCellClick(event) {
+  if (isClickable) return;
+
   const cell = event.target.closest(".col.box");
   if (!cell || !cell.querySelector(".bush") || selectedBuissons.length >= 2)
     return;
@@ -141,6 +145,9 @@ function handleCellClick(event) {
     const firstPokemon = firstCell.querySelector(".pokemon");
     const secondPokemon = secondCell.querySelector(".pokemon");
 
+    // Start Clickable timeout to prevent further clicks
+    isClickable = true;
+
     if (firstPokemon.alt === secondPokemon.alt) {
       let pokeball = document.createElement("img");
       pokeball.src = "./assets/pokeball.png";
@@ -154,17 +161,21 @@ function handleCellClick(event) {
       secondCell.appendChild(clonedPokeball2);
 
       addCapturedPokemon({ name: firstPokemon.alt, sprite: firstPokemon.src });
+      isClickable=false;
     } else {
       setTimeout(() => {
+        // Hide the Pokémon and restore the bushes after the timeout
         firstCell.querySelector(".bush").style.opacity = "1";
         secondCell.querySelector(".bush").style.opacity = "1";
         firstPokemon.style.display = "none";
         secondPokemon.style.display = "none";
-      }, 1000);
+
+        // After the timeout, allow further clicks
+        isClickable = false;
+      }, 1000); // Adjust timeout duration as needed
     }
 
     selectedBuissons = [];
-
     nombreDeCoups++;
     document.getElementById("stat_nombre_de_coups").textContent = nombreDeCoups;
   }
@@ -229,7 +240,7 @@ async function main() {
 
   // Mettre à jour le record affiché au début du jeu
   const storedRecord = localStorage.pokemon_record;
-  console.log(localStorage)
+  console.log(localStorage);
   if (storedRecord) {
     document.getElementById("record").textContent = storedRecord;
   }
@@ -240,3 +251,6 @@ main();
 
 // Ajouter un gestionnaire pour le bouton "Rejouer"
 document.getElementById("rejouer").addEventListener("click", restartGame);
+
+// TODO reprendre la partie en cours
+// TODO partie Fonctionnalité avancée : ### Fonctionnalité avancée : Grille dynamique de jeu en fonction du nombre de pokemons
