@@ -11,52 +11,18 @@ class GameState {
     this.pokemonRevealed = [];
     this.pokemonCaught = [];
 
-    this.save = new GameSave(); // Chargement de l'état du jeu
     this.stats = new GameStats(); // Chargement des statistiques
     // Charger l'état du jeu à partir du localStorage si nécessaire
-    this.loadSave();
+    
   }
 
-  loadSave() {
-    if (this.save.gameState) {
-      const { gameSize, pokemonInGame, pokemonCaught, pokemonRevealed } = this.save.gameState;
-      this.gameSize = gameSize || this.gameSize;
-      this.pokemonInGame = pokemonInGame || [];
-      this.pokemonCaught = pokemonCaught || [];
-      this.pokemonRevealed = pokemonRevealed || [];
-    }else{
-      this.init();
-    }
-  }
-
-  async init() {
-    await this.setPokemonEntities()
-    .then(this.setPokemonInGame());
-    console.log(this.pokemonInGame);
-  }
-
+  
   setPokemonRevealed(index) {
     if (this.pokemonInGame[index]) {
       this.pokemonInGame[index].state = "REVEALED"; // Changer l'état du Pokémon en "REVEALED"
     }
   }
-
-  async setPokemonEntities() {
-    try {
-      const response = await fetch("http://localhost:5500/data/pokemon.json");
-      const data = await response.json();
-
-      // Créer les objets Pokémon à partir des données JSON
-      this.pokemonEntities = data.map(
-        (pokemon) => new Pokemon(pokemon.name, pokemon.sprite)
-      );
-
-      console.log("Pokémons chargés avec succès :", this.pokemonEntities);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des Pokémon :", error);
-    }
-  }
-
+  
   setPokemonInGame() {
     const gameSet = new Set();
   

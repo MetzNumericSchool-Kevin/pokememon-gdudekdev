@@ -4,8 +4,6 @@ class GameGrid {
     this.boxList = []; // Déclare boxList ici pour qu'il soit accessible dans toutes les méthodes
     this.init();
   }
-
-  // Méthode pour ajouter les écouteurs d'événements aux éléments
   setEventListener() {
     this.gridGame = document.querySelector("#grille_de_jeu");
     this.boxList = this.gridGame.querySelectorAll(".col.box"); // Remplir boxList avec les éléments
@@ -17,7 +15,6 @@ class GameGrid {
     });
   }
 
-  // Méthode pour initialiser le jeu
   init() {
     console.log('gamestate de la grid',this.gameState)
     this.setBushes(); // Initialise les buissons
@@ -56,7 +53,7 @@ class GameGrid {
       pokemonImg.style.display = "none"; // Pokémon caché par défaut
       pokemonImg.alt = name;
       pokemonImg.src = sprite;
-
+      
       const bush = cell.querySelector(".bush"); // Récupère le buisson de la cellule
       switch (state) {
         case "REVEALED":

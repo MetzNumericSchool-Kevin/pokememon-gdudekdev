@@ -2,6 +2,7 @@ class Sidebar {
   constructor(gameState) {
     this.gameState = gameState
     this.sidebar = document.querySelector(".liste_pokemons_captures");
+    this.init(this.gameState);
   }
 
   init(gameState) {
